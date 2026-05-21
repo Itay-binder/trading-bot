@@ -1,0 +1,25 @@
+{
+  "updated_at": "2026-05-21",
+  "total_trades": 0,
+  "closed_trades": 0,
+  "open_trades": 0,
+  "win_rate": 0,
+  "loss_rate": 0,
+  "avg_rr_realized": 0,
+  "avg_rr_planned": 0,
+  "total_pnl_percent": 0,
+  "best_trade": null,
+  "worst_trade": null,
+  "streak_current": 0,
+  "streak_type": null,
+  "max_win_streak": 0,
+  "max_loss_streak": 0,
+  "by_asset": {},
+  "by_direction": {
+    "long": { "count": 0, "wins": 0 },
+    "short": { "count": 0, "wins": 0 }
+  },
+  "by_setup": {},
+  "lessons_applied": [],
+  "rules_broken": []
+}
