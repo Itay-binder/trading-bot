@@ -578,6 +578,9 @@ function openModal(idx) {
       <div class="param-box"><div class="param-key">ריסק בפועל</div><div class="param-val red">\${t.actualRisk?'$'+parseInt(t.actualRisk).toLocaleString('en-US'):'—'}</div></div>
       <div class="param-box"><div class="param-key">שווי תיק אחרי עסקה</div><div class="param-val \${win?'green':'red'}">\${t.portfolioVal?'$'+t.portfolioVal.toLocaleString('en-US'):'—'}</div></div>
     </div>
+    \${t.analysisSec?\`<div class="section"><h4>ניתוח שהוביל להחלטה</h4><pre>\${t.analysisSec}</pre></div>\`:''}
+    \${t.whatHappened?\`<div class="section"><h4>מה קרה בפועל</h4><pre>\${t.whatHappened}</pre></div>\`:''}
+    \${t.lessonsSec?\`<div class="section"><h4>לקחים</h4><pre>\${t.lessonsSec}</pre></div>\`:''}
     \${t.pts!=null?\`
     <div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:22px">
       <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:12px">חישוב נקודות — כמה היית עושה עם N חוזים</div>
@@ -617,9 +620,6 @@ function openModal(idx) {
       </div>
       <img src="/trades/\${t.date}_\${t.symbol}_entry.png" style="width:100%;display:block;max-height:420px;object-fit:contain;background:#131722" onerror="this.parentElement.style.display='none'" alt="מאקרו Daily">
     </div>
-    \${t.analysisSec?\`<div class="section"><h4>ניתוח שהוביל להחלטה</h4><pre>\${t.analysisSec}</pre></div>\`:''}
-    \${t.whatHappened?\`<div class="section"><h4>מה קרה בפועל</h4><pre>\${t.whatHappened}</pre></div>\`:''}
-    \${t.lessonsSec?\`<div class="section"><h4>לקחים</h4><pre>\${t.lessonsSec}</pre></div>\`:''}
   \`;
   document.getElementById('overlay').classList.add('open');
 }
