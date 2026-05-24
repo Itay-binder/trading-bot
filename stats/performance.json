@@ -1,11 +1,11 @@
 {
   "updated_at": "2026-05-24",
-  "note": "רק עסקאות דמו אמיתיות — בקטסטים הוסרו",
+  "note": "6 עסקאות דמו — 5 Replay Simulation (ינואר 2026) + 1 Live Demo (מאי 2026). Backtests הוסרו.",
   "account": {
     "starting_balance": 50000,
-    "current_balance": 49520,
-    "total_pnl_usd": -480,
-    "total_pnl_pct": -0.96,
+    "current_balance": 57696,
+    "total_pnl_usd": 7696,
+    "total_pnl_pct": 15.39,
     "currency": "USD",
     "instrument": "MNQ1! (Micro E-mini NASDAQ)",
     "multiplier_per_point": 2,
@@ -13,48 +13,81 @@
     "risk_per_trade_usd": 500
   },
   "portfolio_progression": [
-    { "date": "start",      "balance": 50000, "trade": null,                     "pnl": 0   },
-    { "date": "2026-05-22", "balance": 49520, "trade": "MNQ LONG NY Open Spike", "pnl": -480, "contracts": 6, "pts": -40 }
+    { "date": "start",      "balance": 50000, "trade": null,                              "pnl": 0,     "type": null         },
+    { "date": "2026-01-08", "balance": 49784, "trade": "MNQ SHORT FVG EOD",               "pnl": 264,   "type": "replay", "contracts": 2,  "pts": 66,   "r": 0.74  },
+    { "date": "2026-01-13", "balance": 49344, "trade": "MNQ LONG FVG UTAD",               "pnl": -440,  "type": "replay", "contracts": 5,  "pts": -44,  "r": -1.0  },
+    { "date": "2026-01-14", "balance": 52544, "trade": "MNQ SHORT BSL Sweep NY Open",     "pnl": 3200,  "type": "replay", "contracts": 5,  "pts": 320,  "r": 7.1   },
+    { "date": "2026-01-15", "balance": 54224, "trade": "MNQ SHORT OB LPSY EOD",           "pnl": 1680,  "type": "replay", "contracts": 5,  "pts": 168,  "r": 3.65  },
+    { "date": "2026-01-16", "balance": 57696, "trade": "MNQ SHORT LPSY TP1",              "pnl": 3472,  "type": "replay", "contracts": 7,  "pts": 248,  "r": 6.7   },
+    { "date": "2026-05-22", "balance": 57216, "trade": "MNQ LONG NY Open Spike",          "pnl": -480,  "type": "demo",   "contracts": 6,  "pts": -40,  "r": -1.0  }
   ],
-  "total_trades": 1,
-  "closed_trades": 1,
+  "total_trades": 6,
+  "closed_trades": 6,
   "open_trades": 0,
-  "win_rate": 0,
-  "loss_rate": 100,
-  "avg_rr_realized": -1,
-  "avg_rr_planned": 3.5,
-  "total_pnl_pts": -40,
-  "best_trade": null,
+  "win_rate": 66.7,
+  "loss_rate": 33.3,
+  "avg_rr_realized": 2.70,
+  "avg_rr_planned": 5.25,
+  "total_pnl_pts": 718,
+  "best_trade": "2026-01-14_MNQ_SHORT (+$3,200, +7.1R, +320 נק')",
   "worst_trade": "2026-05-22_MNQ_LONG (-$480, -1R, -40 נק')",
   "streak_current": -1,
   "streak_type": "loss",
-  "max_win_streak": 0,
+  "max_win_streak": 3,
   "max_loss_streak": 1,
   "contract_sizing_formula": "floor(risk_usd / (sl_pts × multiplier)), מינימום 1 חוזה",
   "by_asset": {
-    "MNQ1!": { "count": 1, "wins": 0, "losses": 1, "pnl_pts": -40, "pnl_usd": -480 }
+    "MNQ1!": { "count": 6, "wins": 4, "losses": 2, "pnl_pts": 718, "pnl_usd": 7696 }
   },
   "by_direction": {
-    "long":  { "count": 1, "wins": 0 },
-    "short": { "count": 0, "wins": 0 }
+    "long":  { "count": 2, "wins": 0, "losses": 2, "win_rate_pct": 0,   "note": "0/2 — LONG ב-Bearish Bias = הפסד" },
+    "short": { "count": 4, "wins": 4, "losses": 0, "win_rate_pct": 100, "note": "4/4 — SHORT ב-Bearish Bias = מושלם" }
   },
   "by_setup": {
-    "OB_15M_NY_Open": { "count": 1, "wins": 0 }
+    "BSL_Sweep_SHORT":  { "count": 2, "wins": 2, "avg_r": 6.9,  "note": "Jan 14 +7.1R, Jan 16 +6.7R — HIGHEST WIN RATE" },
+    "OB_SHORT_EOD":     { "count": 1, "wins": 1, "avg_r": 3.65, "note": "Jan 15 +3.65R — EOD קטע, TP1 לא הגיע" },
+    "FVG_SHORT_EOD":    { "count": 1, "wins": 1, "avg_r": 0.74, "note": "Jan 8 +0.74R — TP רחוק מדי לEOD" },
+    "FVG_LONG":         { "count": 1, "wins": 0, "avg_r": -1.0, "note": "Jan 13 UTAD pattern — RED FLAG לא זוהה" },
+    "OB_15M_NY_Open":   { "count": 1, "wins": 0, "avg_r": -1.0, "note": "May 22 Spike retracement" }
   },
   "by_kill_zone": {
-    "ny_open": { "count": 1, "wins": 0 }
+    "ny_open": { "count": 6, "wins": 4, "win_rate_pct": 66.7 }
   },
   "by_wyckoff_phase": {
-    "markup_phase": { "count": 1, "wins": 0 }
+    "distribution_utad": { "count": 4, "wins": 4, "win_rate_pct": 100, "note": "SHORT בDistribution = 100% win" },
+    "markup_phase":       { "count": 2, "wins": 0, "win_rate_pct": 0,   "note": "LONG ב-Markup עם UTAD Red Flags = 0% win" }
+  },
+  "key_patterns_discovered": [
+    "BSL Sweep ב-NY Open + Lower Highs = HIGHEST PRIORITY SHORT SETUP (2/2 ✅, avg 6.9R)",
+    "LPSY Pattern = OB bearish נבדק 3+ ימים עוקבים + Lower High = שורט נקי (100%)",
+    "UTAD Red Flag = 3+ sweeps מעל BSL ללא סגירה מעלה → Distribution, לא Markup",
+    "LONG עם Bearish 4H Bias = 0% win. עצור ולחפש שורט.",
+    "EOD Constraint: TP1 צריך להיות < 300 נק' כשסוגרים ב-20:00 UTC"
+  ],
+  "edge_definition": {
+    "status": "6 עסקאות — מגמה ברורה, נדרשות 20 לאישור מלא",
+    "preliminary_edge": "SHORT בBearish 4H Bias + BSL Sweep/LPSY + NY Open Kill Zone",
+    "win_rate_short": "100% (4/4)",
+    "win_rate_long": "0% (0/2)",
+    "recommendation": "להפסיק LONG trades עד שהBias מ-4H יהיה ברור BULLISH עם BOS מאושר"
   },
   "lessons_applied": [
-    "SL לא הוזז — ✅",
-    "אין עסקת נקמה — ✅",
-    "Limit Order — ✅",
-    "זיהוי Stop Hunt מוסדי — ✅",
-    "נר NY Open ספייקי (151K נפח) — לשקול TP1 דינמי על High הנר"
+    "SL לא הוזז בשום עסקה — ✅ 6/6",
+    "אין עסקת נקמה — ✅ 6/6",
+    "Limit/Market Order מתוכנן — ✅ 6/6",
+    "EOD close בוצע כשTP לא הגיע — ✅ Jan 8, Jan 15",
+    "זיהוי UTAD pattern (Jan 14 SHORT ← הפיכת הפסד Jan 13 לרווח Jan 14)"
   ],
   "rules_broken": [],
-  "weekly_rule_current": "לא להיכנס Long כשהBias מ-4H לא ברור — לחכות ל-BOS",
-  "edge_definition": "בבנייה — נדרשות מינימום 20 עסקאות דמו אמיתיות"
+  "weekly_rule_current": "אל תיכנס LONG אם יש Bearish 4H Bias + UTAD Red Flag. SHORT בלבד עד BOS ברור כלפי מעלה.",
+  "replay_session_summary": {
+    "dates": "2026-01-08 עד 2026-01-16",
+    "instrument": "MNQ1!",
+    "trades": 5,
+    "wins": 4,
+    "losses": 1,
+    "total_pnl_usd": 8176,
+    "total_r": 17.19,
+    "note": "Replay simulation — data_get_ohlcv חשף בארים עתידיים. ניתוחים התבססו על מה שהיה ידוע בזמן הכניסה. ⚠️"
+  }
 }
