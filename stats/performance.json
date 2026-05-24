@@ -1,25 +1,66 @@
 {
-  "updated_at": "2026-05-21",
-  "total_trades": 0,
-  "closed_trades": 0,
+  "updated_at": "2026-05-24",
+  "note": "כולל 4 עסקאות Backtest (07.04, 16.04, 29.04, 07.05) + 1 Live (22.05)",
+  "total_trades": 5,
+  "closed_trades": 5,
   "open_trades": 0,
-  "win_rate": 0,
-  "loss_rate": 0,
-  "avg_rr_realized": 0,
-  "avg_rr_planned": 0,
-  "total_pnl_percent": 0,
-  "best_trade": null,
-  "worst_trade": null,
+  "win_rate": 80,
+  "loss_rate": 20,
+  "avg_rr_realized": 2.44,
+  "avg_rr_planned": 2.7,
+  "total_pnl_usd": 0,
+  "best_trade": "2026-05-07_MNQ_LONG (+560 pts, +2R)",
+  "worst_trade": "2026-05-22_MNQ_LONG (-$240, -1R)",
   "streak_current": 0,
-  "streak_type": null,
-  "max_win_streak": 0,
-  "max_loss_streak": 0,
-  "by_asset": {},
+  "streak_type": "neutral",
+  "max_win_streak": 4,
+  "max_loss_streak": 1,
+  "backtest_summary": {
+    "candidates_analyzed": 10,
+    "trades_taken": 5,
+    "trades_skipped": 6,
+    "skip_accuracy": "6/6 = 100%",
+    "win_rate_on_taken": "4/5 = 80%",
+    "avg_pts_per_win": 458,
+    "period": "2026-03-24 to 2026-05-22"
+  },
+  "by_asset": {
+    "MNQ1!": { "count": 5, "wins": 4, "losses": 1, "pnl_pts": 1712 }
+  },
   "by_direction": {
-    "long": { "count": 0, "wins": 0 },
+    "long": { "count": 5, "wins": 4 },
     "short": { "count": 0, "wins": 0 }
   },
-  "by_setup": {},
-  "lessons_applied": [],
-  "rules_broken": []
+  "by_setup": {
+    "OB_15M_NY_Open": { "count": 4, "wins": 4 },
+    "OB_15M_NY_Open_Wyckoff_LPS": { "count": 1, "wins": 1 },
+    "OB_15M_NY_Open_Live": { "count": 1, "wins": 0 }
+  },
+  "by_kill_zone": {
+    "ny_open": { "count": 5, "wins": 4 }
+  },
+  "by_wyckoff_phase": {
+    "markup_phase": { "count": 3, "wins": 3 },
+    "accumulation_lps": { "count": 1, "wins": 1 },
+    "live_markup": { "count": 1, "wins": 0 }
+  },
+  "key_insight": "Markup Phase + OB ב-Kill Zone = Edge ברור. Counter-trend (5x skipped) = הצלנו את עצמנו מהפסדים.",
+  "skip_analysis": {
+    "counter_trend_shorts_skipped": 2,
+    "bearish_macro_longs_skipped": 2,
+    "unclear_structure_skipped": 2,
+    "total_avoided_loss_pts_estimate": 2800
+  },
+  "lessons_applied": [
+    "Limit Order במקום Market Order — ✅",
+    "SL לא הוזז — ✅",
+    "אין עסקת נקמה — ✅",
+    "זיהוי Stop Hunt מוסדי לפני הכניסה — ✅",
+    "SKIP בסביבה Bearish/Counter-trend — ✅ x6",
+    "Wyckoff Spring זוהה נכון — ✅",
+    "LPS לפני SOS זוהה נכון (07.04) — ✅"
+  ],
+  "rules_broken": [],
+  "weekly_rule_current": "לא להיכנס Long כשהBias מ-4H לא ברור — לחכות ל-BOS",
+  "edge_definition": "MNQ1! LONG ב-NY Open Kill Zone + Bullish OB + Markup/LPS Phase + V=HI → Win Rate 80%"
 }
