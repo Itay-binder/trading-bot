@@ -153,6 +153,7 @@ function buildPage(stats, trades) {
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Trading Dashboard</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"><\/script>
+<script src="https://s3.tradingview.com/tv.js"><\/script>
 <style>
 :root{
   --bg:#131722;--surface:#1e222d;--surface2:#2a2e39;--border:#2a2e39;
@@ -594,23 +595,23 @@ function openModal(idx) {
       </div>
     </div>\`:''}
     <div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:22px">
-      <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:12px">📊 אימות TradingView — גרף מאויר</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
-        <div>
-          <div style="font-size:11px;color:var(--muted);margin-bottom:6px">גרף ביצוע (15M/Daily)</div>
-          <img src="/trades/\${t.filename}_chart.png" onerror="this.parentElement.innerHTML='<div style=\\"color:var(--muted);font-size:12px;padding:40px;text-align:center;border:1px dashed var(--border);border-radius:6px\\">תמונה לא זמינה</div>'" style="width:100%;border-radius:6px;border:1px solid var(--border);cursor:zoom-in" onclick="window.open(this.src,'_blank')" />
-        </div>
-        <div>
-          <div style="font-size:11px;color:var(--muted);margin-bottom:6px">סקירה מאקרו (Daily)</div>
-          <img src="/trades/\${t.filename}_entry.png" onerror="this.parentElement.innerHTML='<div style=\\"color:var(--muted);font-size:12px;padding:40px;text-align:center;border:1px dashed var(--border);border-radius:6px\\">תמונה לא זמינה</div>'" style="width:100%;border-radius:6px;border:1px solid var(--border);cursor:zoom-in" onclick="window.open(this.src,'_blank')" />
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px">
+        <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px">📊 TradingView — ניתוח ואימות חי</div>
+        <div style="display:flex;gap:6px">
+          <button id="tvbtn_15" onclick="switchTF('15')" style="background:#2196f320;border:1px solid var(--blue);color:var(--blue);padding:4px 12px;border-radius:4px;cursor:pointer;font-size:11px;font-weight:600">15M</button>
+          <button id="tvbtn_60" onclick="switchTF('60')" style="background:var(--surface);border:1px solid var(--border);color:var(--muted);padding:4px 12px;border-radius:4px;cursor:pointer;font-size:11px">1H</button>
+          <button id="tvbtn_240" onclick="switchTF('240')" style="background:var(--surface);border:1px solid var(--border);color:var(--muted);padding:4px 12px;border-radius:4px;cursor:pointer;font-size:11px">4H</button>
+          <button id="tvbtn_D" onclick="switchTF('D')" style="background:var(--surface);border:1px solid var(--border);color:var(--muted);padding:4px 12px;border-radius:4px;cursor:pointer;font-size:11px">Daily</button>
         </div>
       </div>
-      <div style="display:flex;gap:16px;flex-wrap:wrap;font-size:12px">
-        <span style="color:var(--blue)">🔵 Entry \${t.entry||'—'}</span>
-        <span style="color:var(--red)">🔴 SL \${t.sl||'—'}</span>
-        <span style="color:var(--green)">🟢 TP \${t.tp||'—'}</span>
-        \${t.rrPlan?'<span style="color:var(--muted)">R:R מתוכנן '+t.rrPlan+':1</span>':''}
-        \${t.killzone?'<span style="color:var(--muted)">Kill Zone: '+t.killzone+'</span>':''}
+      <div id="tv_chart_main" style="height:440px;border-radius:8px;overflow:hidden;background:#131722"></div>
+      <div style="display:flex;gap:20px;flex-wrap:wrap;font-size:12px;margin-top:12px;padding:10px 14px;background:#131722;border-radius:6px;align-items:center">
+        <span style="color:var(--blue);font-weight:700">📍 Entry \${t.entry||'—'}</span>
+        <span style="color:var(--red);font-weight:700">🛑 SL \${t.sl||'—'}</span>
+        <span style="color:var(--green);font-weight:700">🎯 TP \${t.tp||'—'}</span>
+        \${t.rrPlan?'<span style="color:var(--muted)">R:R '+t.rrPlan+':1</span>':''}
+        \${t.killzone?'<span style="color:var(--muted)">⏰ '+t.killzone+'</span>':''}
+        <span style="color:var(--muted);font-size:10px;margin-right:auto">CME_MINI:MNQ1! | \${fmtDate(t.date)} | NY Open 09:30 ET</span>
       </div>
     </div>
     \${t.analysisSec?\`<div class="section"><h4>ניתוח שהוביל להחלטה</h4><pre>\${t.analysisSec}</pre></div>\`:''}
@@ -618,10 +619,67 @@ function openModal(idx) {
     \${t.lessonsSec?\`<div class="section"><h4>לקחים</h4><pre>\${t.lessonsSec}</pre></div>\`:''}
   \`;
   document.getElementById('overlay').classList.add('open');
+  initTVWidget(t);
 }
-function closeModal(){document.getElementById('overlay').classList.remove('open')}
+function closeModal(){
+  document.getElementById('overlay').classList.remove('open');
+  const c = document.getElementById('tv_chart_main');
+  if (c) c.innerHTML = '';
+}
 function closeOnBg(e){if(e.target===document.getElementById('overlay'))closeModal()}
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal()})
+
+let _tvTrade = null;
+function initTVWidget(trade) {
+  _tvTrade = trade;
+  const c = document.getElementById('tv_chart_main');
+  if (!c) return;
+  c.innerHTML = '';
+  if (!window.TradingView) { setTimeout(() => initTVWidget(trade), 200); return; }
+  buildTVWidget('15', trade);
+}
+function buildTVWidget(interval, trade) {
+  trade = trade || _tvTrade;
+  if (!trade || !window.TradingView) return;
+  const c = document.getElementById('tv_chart_main');
+  if (!c) return;
+  c.innerHTML = '';
+  const nyOpen = new Date(trade.date + 'T13:30:00Z').getTime() / 1000;
+  const isIntraday = interval !== 'D';
+  const from = isIntraday ? nyOpen - 7200 : nyOpen - 86400 * 14;
+  const to   = isIntraday ? nyOpen + 25200 : nyOpen + 86400 * 5;
+  new TradingView.widget({
+    container_id: 'tv_chart_main',
+    autosize: true,
+    symbol: 'CME_MINI:MNQ1!',
+    interval: interval,
+    timezone: 'America/New_York',
+    theme: 'dark',
+    style: '1',
+    locale: 'en',
+    toolbar_bg: '#1e222d',
+    enable_publishing: false,
+    withdateranges: true,
+    from: from,
+    to: to,
+    allow_symbol_change: false,
+    save_image: false,
+    hide_volume: false,
+    support_host: 'https://www.tradingview.com'
+  });
+}
+function switchTF(tf) {
+  buildTVWidget(tf);
+  ['15','60','240','D'].forEach(t => {
+    const b = document.getElementById('tvbtn_'+t);
+    if (!b) return;
+    const active = t === tf;
+    b.style.background = active ? '#2196f320' : 'var(--surface)';
+    b.style.borderColor = active ? 'var(--blue)' : 'var(--border)';
+    b.style.color = active ? 'var(--blue)' : 'var(--muted)';
+    b.style.fontWeight = active ? '600' : '400';
+  });
+}
 <\/script>
 </body>
 </html>`;
