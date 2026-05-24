@@ -29,8 +29,10 @@ function parseTrade(filename, content) {
   const tp      = get(/TP1?:\s*([\d,]+)/);
   const rrPlan  = get(/R:R מתוכנן:\s*([\d.]+)/);
   const rrReal  = get(/R realized:\s*\*\*([^*]+)\*\*/) || get(/R realized:\s*([^\n]+)/);
-  const contracts = get(/חוזים:\s*(\d+)/);
-  const killzone  = get(/Kill Zone:\s*([^\n|]+)/);
+  const contracts    = get(/חוזים:\s*\**(\d+)/);
+  const actualRisk   = get(/ריסק בפועל:\s*\$([\d,]+)/);
+  const portfolioVal = get(/תיק אחרי עסקה:\s*\*\*\$([\d,]+)\*\*/);
+  const killzone     = get(/Kill Zone:\s*([^\n|]+)/);
 
   // Result
   const closureRaw = get(/סגירה:\s*\*\*([^*]+)\*\*/);
@@ -54,7 +56,9 @@ function parseTrade(filename, content) {
     sl: sl.replace(',', ''),
     tp: tp.replace(',', ''),
     rrPlan, rrReal, result, pnlUsd,
-    contracts, killzone: killzone.trim(),
+    contracts, actualRisk: actualRisk ? actualRisk.replace(',','') : '',
+    portfolioVal: portfolioVal ? parseInt(portfolioVal.replace(/,/g,'')) : null,
+    killzone: killzone.trim(),
     isWin, analysisSec: analysisSec.trim(),
     lessonsSec: lessonsSec.trim(),
     whatHappened: whatHappened.trim()
@@ -82,7 +86,17 @@ function buildPage(stats, trades) {
   const totalPnl = trades.reduce((s, t) => s + (t.pnlUsd || 0), 0);
   const wr = trades.length ? Math.round(wins / trades.length * 100) : 0;
 
-  // cumulative P&L for chart
+  // portfolio progression from performance.json (balance, not just P&L)
+  const STARTING = (stats.account && stats.account.starting_balance) || 50000;
+  const currentBalance = (stats.account && stats.account.current_balance) || (STARTING + totalPnl);
+  const totalPnlPct = ((currentBalance - STARTING) / STARTING * 100).toFixed(2);
+
+  const progData = (stats.portfolio_progression || []);
+  const equityPoints = progData.length
+    ? progData.map(p => ({ label: p.date === 'start' ? 'פתיחה' : fmtDate(p.date), value: p.balance }))
+    : [{ label: 'פתיחה', value: STARTING }, ...(() => { let b = STARTING; return [...trades].reverse().map(t => { b += t.pnlUsd || 0; return { label: fmtDate(t.date), value: b }; }); })()];
+
+  // legacy cumulative P&L (still used for donut / tooltip)
   let cum = 0;
   const pnlPoints = [...trades].reverse().map(t => {
     cum += t.pnlUsd || 0;
@@ -111,6 +125,7 @@ function buildPage(stats, trades) {
   const tradeRows = trades.map((t, i) => {
     const dir = t.direction.toLowerCase();
     const res = t.result.toLowerCase();
+    const portfolioStr = t.portfolioVal ? '$' + t.portfolioVal.toLocaleString('en-US') : '—';
     return `<tr class="tr-row" onclick="openModal(${i})">
       <td>${fmtDate(t.date)}</td>
       <td><strong>${t.symbol}</strong></td>
@@ -120,8 +135,9 @@ function buildPage(stats, trades) {
       <td class="num green">${t.tp}</td>
       <td><span class="badge res-${res}">${t.result}</span></td>
       <td class="${t.isWin ? 'green' : 'red'}">${t.rrReal || '—'}</td>
+      <td class="contracts">${t.contracts ? t.contracts + ' MNQ' : '—'}</td>
       <td class="${t.pnlUsd >= 0 ? 'green' : 'red'} bold">${t.pnlUsd >= 0 ? '+' : ''}$${Math.abs(t.pnlUsd)}</td>
-      <td class="contracts">${t.contracts || '—'}</td>
+      <td class="${t.isWin ? 'green' : 'red'} num" style="font-size:12px">${portfolioStr}</td>
     </tr>`;
   }).join('');
 
@@ -359,20 +375,20 @@ thead th:last-child{border-radius:0 8px 8px 0}
 </div>
 
 <div class="stats-row">
-  <div class="scard blue">
-    <div class="scard-label">סה"כ עסקאות</div>
-    <div class="scard-val c-blue">${trades.length}</div>
-    <div class="scard-sub">${wins}W / ${losses}L</div>
+  <div class="scard ${totalPnl >= 0 ? 'green' : 'red'}">
+    <div class="scard-label">שווי תיק (סימולציה)</div>
+    <div class="scard-val ${totalPnl >= 0 ? 'c-green' : 'c-red'}">$${currentBalance.toLocaleString('en-US')}</div>
+    <div class="scard-sub">פתיחה $${STARTING.toLocaleString('en-US')} | ${totalPnl >= 0 ? '+' : ''}${totalPnlPct}%</div>
+  </div>
+  <div class="scard ${totalPnl >= 0 ? 'green' : 'red'}">
+    <div class="scard-label">P&L כולל</div>
+    <div class="scard-val ${totalPnl >= 0 ? 'c-green' : 'c-red'}">${totalPnl >= 0 ? '+' : ''}$${Math.abs(totalPnl).toLocaleString('en-US')}</div>
+    <div class="scard-sub">${wins} רווח / ${losses} הפסד</div>
   </div>
   <div class="scard ${wr >= 50 ? 'green' : 'red'}">
     <div class="scard-label">אחוז הצלחה</div>
     <div class="scard-val ${wr >= 50 ? 'c-green' : 'c-red'}">${wr}%</div>
-    <div class="scard-sub">מינימום יעד: 40%</div>
-  </div>
-  <div class="scard ${totalPnl >= 0 ? 'green' : 'red'}">
-    <div class="scard-label">P&L כולל (דמו)</div>
-    <div class="scard-val ${totalPnl >= 0 ? 'c-green' : 'c-red'}">${totalPnl >= 0 ? '+' : ''}$${Math.abs(totalPnl)}</div>
-    <div class="scard-sub">הון ראשוני: $50,000</div>
+    <div class="scard-sub">${trades.length} עסקאות | יעד: 40%+</div>
   </div>
   <div class="scard ${(stats.avg_rr_realized || 0) >= 2 ? 'green' : 'yellow'}">
     <div class="scard-label">R:R ממוצע בפועל</div>
@@ -395,7 +411,7 @@ thead th:last-child{border-radius:0 8px 8px 0}
 <div id="tab-stats" class="content active">
   <div class="charts-grid">
     <div class="card">
-      <h3>עקומת P&L מצטבר</h3>
+      <h3>עקומת הון — שווי תיק בפועל ($)</h3>
       <canvas id="pnlChart" height="85"></canvas>
     </div>
     <div class="card">
@@ -436,7 +452,7 @@ thead th:last-child{border-radius:0 8px 8px 0}
           <tr>
             <th>תאריך</th><th>סימבול</th><th>כיוון</th>
             <th>כניסה</th><th>SL</th><th>TP</th>
-            <th>תוצאה</th><th>R:R</th><th>P&L</th><th>חוזים</th>
+            <th>תוצאה</th><th>R:R</th><th>חוזים</th><th>P&L</th><th>שווי תיק</th>
           </tr>
         </thead>
         <tbody>${tradeRows}</tbody>
@@ -456,6 +472,8 @@ thead th:last-child{border-radius:0 8px 8px 0}
 <script>
 const TRADES = ${tradesJson};
 const PNL_PTS = ${pnlJson};
+const EQUITY_PTS = ${JSON.stringify(equityPoints)};
+const STARTING_BAL = ${STARTING};
 
 // Clock
 function tick(){
@@ -477,27 +495,35 @@ function switchTab(id, el) {
 Chart.defaults.color = '#787b86';
 Chart.defaults.borderColor = '#2a2e39';
 
-const pnlColor = (PNL_PTS.length && PNL_PTS[PNL_PTS.length-1].value >= 0) ? '#26a69a' : '#ef5350';
-const pnlBg = (PNL_PTS.length && PNL_PTS[PNL_PTS.length-1].value >= 0) ? '#26a69a15' : '#ef535015';
+const lastEquity = EQUITY_PTS.length ? EQUITY_PTS[EQUITY_PTS.length-1].value : STARTING_BAL;
+const equityColor = lastEquity >= STARTING_BAL ? '#26a69a' : '#ef5350';
+const equityBg    = lastEquity >= STARTING_BAL ? '#26a69a15' : '#ef535015';
 
 new Chart(document.getElementById('pnlChart'), {
   type: 'line',
   data: {
-    labels: PNL_PTS.length ? PNL_PTS.map(p=>p.label) : ['—'],
+    labels: EQUITY_PTS.map(p=>p.label),
     datasets: [{
-      data: PNL_PTS.length ? PNL_PTS.map(p=>p.value) : [0],
-      borderColor: pnlColor, backgroundColor: pnlBg,
-      fill: true, tension: 0.4, pointRadius: 6,
-      pointBackgroundColor: '#1e222d', pointBorderColor: pnlColor, pointBorderWidth: 2,
-      pointHoverRadius: 8
+      data: EQUITY_PTS.map(p=>p.value),
+      borderColor: equityColor, backgroundColor: equityBg,
+      fill: true, tension: 0.35, pointRadius: 6,
+      pointBackgroundColor: '#1e222d', pointBorderColor: equityColor, pointBorderWidth: 2,
+      pointHoverRadius: 9
     }]
   },
   options: {
-    responsive:true, plugins:{legend:{display:false},
-      tooltip:{callbacks:{label:c=>' $'+c.parsed.y.toFixed(0)}}},
+    responsive:true,
+    plugins:{
+      legend:{display:false},
+      tooltip:{callbacks:{label:c=>' $'+c.parsed.y.toLocaleString('en-US')}}
+    },
     scales:{
       x:{grid:{color:'#2a2e3960'},ticks:{color:'#787b86'}},
-      y:{grid:{color:'#2a2e3960'},ticks:{color:'#787b86',callback:v=>'$'+v}}
+      y:{
+        grid:{color:'#2a2e3960'},
+        ticks:{color:'#787b86',callback:v=>'$'+v.toLocaleString('en-US')},
+        min: Math.floor(Math.min(...EQUITY_PTS.map(p=>p.value)) * 0.998)
+      }
     }
   }
 });
@@ -543,7 +569,9 @@ function openModal(idx) {
       <div class="param-box"><div class="param-key">Take Profit</div><div class="param-val green">\${t.tp||'—'}</div></div>
       <div class="param-box"><div class="param-key">R:R מתוכנן</div><div class="param-val">\${t.rrPlan?t.rrPlan+':1':'—'}</div></div>
       <div class="param-box"><div class="param-key">R:R בפועל</div><div class="param-val \${win?'green':'red'}">\${t.rrReal||'—'}</div></div>
-      <div class="param-box"><div class="param-key">חוזים</div><div class="param-val">\${t.contracts||'—'}</div></div>
+      <div class="param-box"><div class="param-key">חוזים</div><div class="param-val">\${t.contracts?t.contracts+' MNQ':'—'}</div></div>
+      <div class="param-box"><div class="param-key">ריסק בפועל</div><div class="param-val red">\${t.actualRisk?'$'+parseInt(t.actualRisk).toLocaleString('en-US'):'—'}</div></div>
+      <div class="param-box"><div class="param-key">שווי תיק אחרי עסקה</div><div class="param-val \${win?'green':'red'}">\${t.portfolioVal?'$'+t.portfolioVal.toLocaleString('en-US'):'—'}</div></div>
     </div>
     \${t.analysisSec?\`<div class="section"><h4>ניתוח שהוביל להחלטה</h4><pre>\${t.analysisSec}</pre></div>\`:''}
     \${t.whatHappened?\`<div class="section"><h4>מה קרה בפועל</h4><pre>\${t.whatHappened}</pre></div>\`:''}
