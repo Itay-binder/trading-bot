@@ -2,3 +2,5 @@
 .env
 *.key
 secrets/
+
+.vercel

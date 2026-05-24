@@ -33,19 +33,17 @@ function parseTrade(filename, content) {
   const actualRisk   = get(/ריסק בפועל:\s*\$([\d,]+)/);
   const portfolioVal = get(/תיק אחרי עסקה:\s*\*\*\$([\d,]+)\*\*/);
   const killzone     = get(/Kill Zone:\s*([^\n|]+)/);
-  // extract raw points from P&L line: "(X חוזים × 340 נק' × $2/נק')"
-  const ptsMatch = content.match(/P&L בפועל[^\n]*\(.*?×\s*([\d]+)\s*נק'/);
+  // points are the canonical value — pnlUsd is derived
+  const ptsMatch = content.match(/נקודות:\s*\*\*([-+]?\d+)\s*נק'?\*\*/);
   const pts = ptsMatch ? parseInt(ptsMatch[1]) : null;
-  const perContractUsd = pts ? pts * 2 : null; // MNQ = $2/point
+  const perContractUsd = pts != null ? Math.abs(pts) * 2 : null; // MNQ = $2/point
 
   // Result
   const closureRaw = get(/סגירה:\s*\*\*([^*]+)\*\*/);
   let result = closureRaw || 'UNKNOWN';
 
-  // P&L
-  const pnlMatch = content.match(/\*\*([-+]?\$[\d,]+)\*\*/);
-  let pnlUsd = 0;
-  if (pnlMatch) pnlUsd = parseFloat(pnlMatch[1].replace(/[$,]/g, '')) || 0;
+  // P&L derived: pts × contracts × $2
+  const pnlUsd = pts != null ? pts * (parseInt(contracts) || 1) * 2 : 0;
 
   // Analysis sections
   const analysisSec = (content.match(/## ניתוח שהוביל להחלטה\n([\s\S]+?)(?=\n## )/) || [])[1] || '';
@@ -89,6 +87,7 @@ function buildPage(stats, trades) {
   const wins = trades.filter(t => t.isWin).length;
   const losses = trades.length - wins;
   const totalPnl = trades.reduce((s, t) => s + (t.pnlUsd || 0), 0);
+  const totalPts = trades.reduce((s, t) => s + (t.pts || 0), 0);
   const wr = trades.length ? Math.round(wins / trades.length * 100) : 0;
 
   // portfolio progression from performance.json (balance, not just P&L)
@@ -141,8 +140,7 @@ function buildPage(stats, trades) {
       <td><span class="badge res-${res}">${t.result}</span></td>
       <td class="${t.isWin ? 'green' : 'red'}">${t.rrReal || '—'}</td>
       <td class="contracts">${t.contracts ? t.contracts + ' MNQ' : '—'}</td>
-      <td class="${t.isWin ? 'green' : 'red'}" style="font-family:monospace;font-size:13px" title="${t.perContractUsd ? '$'+t.perContractUsd+' לחוזה' : ''}">${t.pts != null ? (t.isWin ? '+' : '') + t.pts + ' נק׳' : '—'}</td>
-      <td class="${t.pnlUsd >= 0 ? 'green' : 'red'} bold">${t.pnlUsd >= 0 ? '+' : ''}$${Math.abs(t.pnlUsd)}</td>
+      <td class="${t.isWin ? 'green' : 'red'} bold" style="font-family:monospace;font-size:14px" title="${t.pnlUsd != 0 ? (t.pnlUsd >= 0 ? '+' : '') + '$' + Math.abs(t.pnlUsd) + ' (' + (t.contracts||1) + ' חוזים)' : ''}">${t.pts != null ? (t.pts > 0 ? '+' : '') + t.pts + ' נק׳' : '—'}</td>
       <td class="${t.isWin ? 'green' : 'red'} num" style="font-size:12px">${portfolioStr}</td>
     </tr>`;
   }).join('');
@@ -386,10 +384,10 @@ thead th:last-child{border-radius:0 8px 8px 0}
     <div class="scard-val ${totalPnl >= 0 ? 'c-green' : 'c-red'}">$${currentBalance.toLocaleString('en-US')}</div>
     <div class="scard-sub">פתיחה $${STARTING.toLocaleString('en-US')} | ${totalPnl >= 0 ? '+' : ''}${totalPnlPct}%</div>
   </div>
-  <div class="scard ${totalPnl >= 0 ? 'green' : 'red'}">
-    <div class="scard-label">P&L כולל</div>
-    <div class="scard-val ${totalPnl >= 0 ? 'c-green' : 'c-red'}">${totalPnl >= 0 ? '+' : ''}$${Math.abs(totalPnl).toLocaleString('en-US')}</div>
-    <div class="scard-sub">${wins} רווח / ${losses} הפסד</div>
+  <div class="scard ${totalPts >= 0 ? 'green' : 'red'}">
+    <div class="scard-label">נקודות כולל</div>
+    <div class="scard-val ${totalPts >= 0 ? 'c-green' : 'c-red'}">${totalPts >= 0 ? '+' : ''}${totalPts} נק׳</div>
+    <div class="scard-sub">${wins} רווח / ${losses} הפסד | $${Math.abs(totalPts * 2)} לחוזה</div>
   </div>
   <div class="scard ${wr >= 50 ? 'green' : 'red'}">
     <div class="scard-label">אחוז הצלחה</div>
@@ -458,7 +456,7 @@ thead th:last-child{border-radius:0 8px 8px 0}
           <tr>
             <th>תאריך</th><th>סימבול</th><th>כיוון</th>
             <th>כניסה</th><th>SL</th><th>TP</th>
-            <th>תוצאה</th><th>R:R</th><th>חוזים</th><th>נקודות</th><th>P&L</th><th>שווי תיק</th>
+            <th>תוצאה</th><th>R:R</th><th>חוזים</th><th>נקודות</th><th>שווי תיק</th>
           </tr>
         </thead>
         <tbody>${tradeRows}</tbody>
@@ -567,7 +565,7 @@ function openModal(idx) {
     <div class="modal-title">\${t.symbol} \${t.direction} — \${fmtDate(t.date)}</div>
     <div class="modal-sub">עסקה #\${idx+1}\${t.contracts?' | '+t.contracts+' חוזים':''}\${t.killzone?' | Kill Zone: '+t.killzone:''}</div>
     <div class="result-banner \${win?'win':'loss'}">
-      \${win?'✅ רווח':'❌ הפסד'} &nbsp;|&nbsp; תוצאה: \${t.result} &nbsp;|&nbsp; P&L: \${t.pnlUsd>=0?'+':''}\$\${Math.abs(t.pnlUsd)} &nbsp;|&nbsp; R realized: \${t.rrReal||'—'}
+      \${win?'✅ רווח':'❌ הפסד'} &nbsp;|&nbsp; תוצאה: \${t.result} &nbsp;|&nbsp; <strong>\${t.pts!=null?(t.pts>0?'+':'')+t.pts+' נק׳':'—'}</strong>\${t.pnlUsd?'  ('+( t.pnlUsd>=0?'+':'')+'\$'+Math.abs(t.pnlUsd)+' ב-'+(t.contracts||1)+' חוזים)':''} &nbsp;|&nbsp; R: \${t.rrReal||'—'}
     </div>
     <div class="param-grid">
       <div class="param-box"><div class="param-key">כניסה</div><div class="param-val">\${t.entry||'—'}</div></div>
