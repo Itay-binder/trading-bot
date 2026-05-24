@@ -34,6 +34,8 @@ function parseTrade(filename, content) {
   const actualRisk   = get(/ריסק בפועל:\s*\$([\d,]+)/);
   const portfolioVal = get(/תיק אחרי עסקה:\s*\*\*\$([\d,]+)\*\*/);
   const killzone     = get(/Kill Zone:\s*([^\n|]+)/);
+  const entryTime   = get(/כניסה בשעה:\s*([^\n]+)/);
+  const exitTime    = get(/יציאה בשעה:\s*([^\n]+)/);
   // points are the canonical value — pnlUsd is derived
   const ptsMatch = content.match(/נקודות:\s*\*\*([-+]?\d+)\s*נק'?\*\*/);
   const pts = ptsMatch ? parseInt(ptsMatch[1]) : null;
@@ -63,6 +65,7 @@ function parseTrade(filename, content) {
     portfolioVal: portfolioVal ? parseInt(portfolioVal.replace(/,/g,'')) : null,
     pts, perContractUsd,
     killzone: killzone.trim(), tvUrl,
+    entryTime: entryTime.trim(), exitTime: exitTime.trim(),
     isWin, analysisSec: analysisSec.trim(),
     lessonsSec: lessonsSec.trim(),
     whatHappened: whatHappened.trim()
@@ -577,6 +580,8 @@ function openModal(idx) {
       <div class="param-box"><div class="param-key">חוזים</div><div class="param-val">\${t.contracts?t.contracts+' MNQ':'—'}</div></div>
       <div class="param-box"><div class="param-key">ריסק בפועל</div><div class="param-val red">\${t.actualRisk?'$'+parseInt(t.actualRisk).toLocaleString('en-US'):'—'}</div></div>
       <div class="param-box"><div class="param-key">שווי תיק אחרי עסקה</div><div class="param-val \${win?'green':'red'}">\${t.portfolioVal?'$'+t.portfolioVal.toLocaleString('en-US'):'—'}</div></div>
+      <div class="param-box"><div class="param-key">⏱ זמן כניסה</div><div class="param-val" style="font-size:13px">\${t.entryTime||'—'}</div></div>
+      <div class="param-box"><div class="param-key">\${win?'✅':'❌'} זמן יציאה</div><div class="param-val \${win?'green':'red'}" style="font-size:13px">\${t.exitTime||'—'}</div></div>
     </div>
     \${t.analysisSec?\`<div class="section"><h4>ניתוח שהוביל להחלטה</h4><pre>\${t.analysisSec}</pre></div>\`:''}
     \${t.whatHappened?\`<div class="section"><h4>מה קרה בפועל</h4><pre>\${t.whatHappened}</pre></div>\`:''}

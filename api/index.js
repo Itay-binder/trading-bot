@@ -32,6 +32,8 @@ function parseTrade(filename, content) {
   const actualRisk   = get(/ריסק בפועל:\s*\$([\d,]+)/);
   const portfolioVal = get(/תיק אחרי עסקה:\s*\*\*\$([\d,]+)\*\*/);
   const killzone     = get(/Kill Zone:\s*([^\n|]+)/);
+  const entryTime   = get(/כניסה בשעה:\s*([^\n]+)/);
+  const exitTime    = get(/יציאה בשעה:\s*([^\n]+)/);
   // points are the canonical value — pnlUsd is derived
   const ptsMatch = content.match(/נקודות:\s*\*\*([-+]?\d+)\s*נק'?\*\*/);
   const pts = ptsMatch ? parseInt(ptsMatch[1]) : null;
@@ -61,6 +63,7 @@ function parseTrade(filename, content) {
     portfolioVal: portfolioVal ? parseInt(portfolioVal.replace(/,/g,'')) : null,
     pts, perContractUsd,
     killzone: killzone.trim(), tvUrl,
+    entryTime: entryTime.trim(), exitTime: exitTime.trim(),
     isWin, analysisSec: analysisSec.trim(),
     lessonsSec: lessonsSec.trim(),
     whatHappened: whatHappened.trim()
