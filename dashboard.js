@@ -50,6 +50,14 @@ function parseTrade(filename, content) {
   const lessonsSec  = (content.match(/## לקחים\n([\s\S]+?)$/) || [])[1] || '';
   const whatHappened = (content.match(/## מה קרה בפועל\n([\s\S]+?)(?=\n## )/) || [])[1] || '';
 
+  const timelineSec = (content.match(/## ציר זמן\n([\s\S]+?)(?=\n## |$)/) || [])[1] || '';
+  const timelineEvents = timelineSec.trim() ? timelineSec.trim().split('\n')
+    .filter(l => /^-\s+\*\*/.test(l))
+    .map(l => ({
+      time: (l.match(/^-\s+\*\*([^*]+)\*\*/) || [])[1] || '',
+      desc: l.replace(/^-\s+\*\*[^*]+\*\*\s*[—-]\s*/, '').trim()
+    })) : [];
+  const tvUrl = get(/tv_chart_url:\s*(https?:\/\/\S+)/);
   const isWin = result === 'TP1' || result === 'TP2' || (rrReal && !rrReal.startsWith('-') && rrReal !== '0');
 
   return {
@@ -64,7 +72,8 @@ function parseTrade(filename, content) {
     killzone: killzone.trim(),
     isWin, analysisSec: analysisSec.trim(),
     lessonsSec: lessonsSec.trim(),
-    whatHappened: whatHappened.trim()
+    whatHappened: whatHappened.trim(),
+    timelineEvents, tvUrl
   };
 }
 
@@ -343,6 +352,18 @@ thead th:last-child{border-radius:0 8px 8px 0}
   background:var(--surface2);border-radius:8px;padding:14px;
 }
 
+/* TIMELINE */
+.tl-wrap{position:relative;padding-right:24px}
+.tl-wrap::before{content:'';position:absolute;right:6px;top:12px;bottom:12px;width:2px;background:var(--border);border-radius:2px}
+.tl-item{display:flex;align-items:flex-start;gap:12px;padding:7px 0;position:relative}
+.tl-dot{width:14px;height:14px;border-radius:50%;flex-shrink:0;margin-top:2px;position:relative;z-index:1;border:2px solid var(--muted);background:var(--surface2)}
+.tl-dot.entry{border-color:var(--blue);background:#2196f325}
+.tl-dot.tp{border-color:var(--green);background:#26a69a25}
+.tl-dot.sl{border-color:var(--red);background:#ef535025}
+.tl-dot.high{border-color:var(--yellow);background:#f7a60025}
+.tl-time{font-size:12px;font-weight:700;color:var(--blue);white-space:nowrap;min-width:100px;flex-shrink:0;font-family:monospace;padding-top:1px}
+.tl-desc{font-size:13px;color:var(--text);line-height:1.5;padding-top:1px}
+
 /* EMPTY STATE */
 .empty-state{
   text-align:center;padding:80px 20px;
@@ -553,6 +574,42 @@ new Chart(document.getElementById('donutChart'), {
   }
 });
 
+// Timeline helper
+function buildTimeline(events) {
+  if (!events || !events.length) return '';
+  const items = events.map(ev => {
+    const d = ev.desc || '';
+    const dotClass = (d.includes('✅') || d.includes('כניסה')) ? 'entry'
+      : (d.includes('TP') && !d.includes('לא')) ? 'tp'
+      : (d.includes('🛑') || d.includes('SL נשבר')) ? 'sl'
+      : (d.includes('🚀') || d.includes('שיא')) ? 'high'
+      : 'default';
+    return '<div class="tl-item">'
+      + '<div class="tl-dot ' + dotClass + '"></div>'
+      + '<div class="tl-time">' + ev.time + '</div>'
+      + '<div class="tl-desc">' + d + '</div>'
+      + '</div>';
+  }).join('');
+  return '<div class="section"><h4>ציר זמן — אירועי עסקה</h4>'
+    + '<div style="background:var(--surface2);border-radius:8px;padding:16px 16px 8px">'
+    + '<div class="tl-wrap">' + items + '</div>'
+    + '</div></div>';
+}
+
+// TF buttons helper
+function buildTFButtons() {
+  return '<div style="display:flex;gap:6px">'
+    + [['15','15M'],['60','1H'],['240','4H'],['D','Daily']].map(([tf, lbl], i) =>
+        '<button id="tvbtn_' + tf + '" onclick="switchTF(\'' + tf + '\')" style="'
+        + 'background:' + (i===0 ? '#2196f320' : 'var(--surface)') + ';'
+        + 'border:1px solid ' + (i===0 ? 'var(--blue)' : 'var(--border)') + ';'
+        + 'color:' + (i===0 ? 'var(--blue)' : 'var(--muted)') + ';'
+        + 'padding:4px 12px;border-radius:4px;cursor:pointer;font-size:11px'
+        + (i===0 ? ';font-weight:600' : '') + '">' + lbl + '</button>'
+      ).join('')
+    + '</div>';
+}
+
 // Modal
 function fmtDate(d){
   const p=(d||'').split('-');
@@ -598,15 +655,10 @@ function openModal(idx) {
     </div>\`:''}
     <div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:22px">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px">
-        <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px">📊 TradingView — ניתוח ואימות חי</div>
-        <div style="display:flex;gap:6px">
-          <button id="tvbtn_15" onclick="switchTF('15')" style="background:#2196f320;border:1px solid var(--blue);color:var(--blue);padding:4px 12px;border-radius:4px;cursor:pointer;font-size:11px;font-weight:600">15M</button>
-          <button id="tvbtn_60" onclick="switchTF('60')" style="background:var(--surface);border:1px solid var(--border);color:var(--muted);padding:4px 12px;border-radius:4px;cursor:pointer;font-size:11px">1H</button>
-          <button id="tvbtn_240" onclick="switchTF('240')" style="background:var(--surface);border:1px solid var(--border);color:var(--muted);padding:4px 12px;border-radius:4px;cursor:pointer;font-size:11px">4H</button>
-          <button id="tvbtn_D" onclick="switchTF('D')" style="background:var(--surface);border:1px solid var(--border);color:var(--muted);padding:4px 12px;border-radius:4px;cursor:pointer;font-size:11px">Daily</button>
-        </div>
+        <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px">📊 TradingView — ניתוח ואימות חי\${t.tvUrl?' <span style="color:var(--green);font-size:10px;font-weight:600">(גרף מפורסם ✓)</span>':''}</div>
+        \${t.tvUrl?'':buildTFButtons()}
       </div>
-      <div id="tv_chart_main" style="height:440px;border-radius:8px;overflow:hidden;background:#131722"></div>
+      \${t.tvUrl?'<iframe src="'+t.tvUrl+'" style="width:100%;height:440px;border:none;border-radius:8px" allowfullscreen></iframe>':'<div id="tv_chart_main" style="height:440px;border-radius:8px;overflow:hidden;background:#131722"></div>'}
       <div style="display:flex;gap:20px;flex-wrap:wrap;font-size:12px;margin-top:12px;padding:10px 14px;background:#131722;border-radius:6px;align-items:center">
         <span style="color:var(--blue);font-weight:700">📍 Entry \${t.entry||'—'}</span>
         <span style="color:var(--red);font-weight:700">🛑 SL \${t.sl||'—'}</span>
@@ -616,12 +668,13 @@ function openModal(idx) {
         <span style="color:var(--muted);font-size:10px;margin-right:auto">CME_MINI:MNQ1! | \${fmtDate(t.date)} | NY Open 09:30 ET</span>
       </div>
     </div>
+    \${buildTimeline(t.timelineEvents)}
     \${t.analysisSec?\`<div class="section"><h4>ניתוח שהוביל להחלטה</h4><pre>\${t.analysisSec}</pre></div>\`:''}
     \${t.whatHappened?\`<div class="section"><h4>מה קרה בפועל</h4><pre>\${t.whatHappened}</pre></div>\`:''}
     \${t.lessonsSec?\`<div class="section"><h4>לקחים</h4><pre>\${t.lessonsSec}</pre></div>\`:''}
   \`;
   document.getElementById('overlay').classList.add('open');
-  initTVWidget(t);
+  if (!t.tvUrl) initTVWidget(t);
 }
 function closeModal(){
   document.getElementById('overlay').classList.remove('open');
