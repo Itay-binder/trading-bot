@@ -33,6 +33,10 @@ function parseTrade(filename, content) {
   const actualRisk   = get(/ריסק בפועל:\s*\$([\d,]+)/);
   const portfolioVal = get(/תיק אחרי עסקה:\s*\*\*\$([\d,]+)\*\*/);
   const killzone     = get(/Kill Zone:\s*([^\n|]+)/);
+  // extract raw points from P&L line: "(X חוזים × 340 נק' × $2/נק')"
+  const ptsMatch = content.match(/P&L בפועל[^\n]*\(.*?×\s*([\d]+)\s*נק'/);
+  const pts = ptsMatch ? parseInt(ptsMatch[1]) : null;
+  const perContractUsd = pts ? pts * 2 : null; // MNQ = $2/point
 
   // Result
   const closureRaw = get(/סגירה:\s*\*\*([^*]+)\*\*/);
@@ -58,6 +62,7 @@ function parseTrade(filename, content) {
     rrPlan, rrReal, result, pnlUsd,
     contracts, actualRisk: actualRisk ? actualRisk.replace(',','') : '',
     portfolioVal: portfolioVal ? parseInt(portfolioVal.replace(/,/g,'')) : null,
+    pts, perContractUsd,
     killzone: killzone.trim(),
     isWin, analysisSec: analysisSec.trim(),
     lessonsSec: lessonsSec.trim(),
@@ -136,6 +141,7 @@ function buildPage(stats, trades) {
       <td><span class="badge res-${res}">${t.result}</span></td>
       <td class="${t.isWin ? 'green' : 'red'}">${t.rrReal || '—'}</td>
       <td class="contracts">${t.contracts ? t.contracts + ' MNQ' : '—'}</td>
+      <td class="${t.isWin ? 'green' : 'red'}" style="font-family:monospace;font-size:13px" title="${t.perContractUsd ? '$'+t.perContractUsd+' לחוזה' : ''}">${t.pts != null ? (t.isWin ? '+' : '') + t.pts + ' נק׳' : '—'}</td>
       <td class="${t.pnlUsd >= 0 ? 'green' : 'red'} bold">${t.pnlUsd >= 0 ? '+' : ''}$${Math.abs(t.pnlUsd)}</td>
       <td class="${t.isWin ? 'green' : 'red'} num" style="font-size:12px">${portfolioStr}</td>
     </tr>`;
@@ -452,7 +458,7 @@ thead th:last-child{border-radius:0 8px 8px 0}
           <tr>
             <th>תאריך</th><th>סימבול</th><th>כיוון</th>
             <th>כניסה</th><th>SL</th><th>TP</th>
-            <th>תוצאה</th><th>R:R</th><th>חוזים</th><th>P&L</th><th>שווי תיק</th>
+            <th>תוצאה</th><th>R:R</th><th>חוזים</th><th>נקודות</th><th>P&L</th><th>שווי תיק</th>
           </tr>
         </thead>
         <tbody>${tradeRows}</tbody>
@@ -573,6 +579,24 @@ function openModal(idx) {
       <div class="param-box"><div class="param-key">ריסק בפועל</div><div class="param-val red">\${t.actualRisk?'$'+parseInt(t.actualRisk).toLocaleString('en-US'):'—'}</div></div>
       <div class="param-box"><div class="param-key">שווי תיק אחרי עסקה</div><div class="param-val \${win?'green':'red'}">\${t.portfolioVal?'$'+t.portfolioVal.toLocaleString('en-US'):'—'}</div></div>
     </div>
+    \${t.pts!=null?\`
+    <div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:22px">
+      <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:12px">חישוב נקודות — כמה היית עושה עם N חוזים</div>
+      <div style="font-size:15px;font-weight:700;color:#fff;margin-bottom:10px">
+        \${Math.abs(t.pts)} נק׳ × $2/נק׳ = <span style="color:var(--blue)">$\${t.perContractUsd} לחוזה</span>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px">
+        \${[1,2,3,5,8,10,12,15].map(n=>{
+          const val=t.perContractUsd*n;
+          const isActual=n===parseInt(t.contracts||0);
+          return \`<div style="background:\${isActual?'#2196f320':''};border:1px solid \${isActual?'var(--blue)':'var(--border)'};border-radius:6px;padding:10px;text-align:center">
+            <div style="font-size:11px;color:var(--muted)">\${n} חוזה\${n>1?'ות':''}</div>
+            <div style="font-size:16px;font-weight:700;color:\${win?'var(--green)':'var(--red)'};">\${win?'+':'-'}$\${val.toLocaleString('en-US')}</div>
+            \${isActual?'<div style="font-size:10px;color:var(--blue)">✓ בפועל</div>':''}
+          </div>\`;
+        }).join('')}
+      </div>
+    </div>\`:''}
     \${t.analysisSec?\`<div class="section"><h4>ניתוח שהוביל להחלטה</h4><pre>\${t.analysisSec}</pre></div>\`:''}
     \${t.whatHappened?\`<div class="section"><h4>מה קרה בפועל</h4><pre>\${t.whatHappened}</pre></div>\`:''}
     \${t.lessonsSec?\`<div class="section"><h4>לקחים</h4><pre>\${t.lessonsSec}</pre></div>\`:''}
