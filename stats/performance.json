@@ -1,11 +1,11 @@
 {
   "updated_at": "2026-05-24",
-  "note": "כולל 5 עסקאות סימולציה (07.04, 16.04, 29.04, 07.05, 22.05)",
+  "note": "רק עסקאות דמו אמיתיות — בקטסטים הוסרו",
   "account": {
     "starting_balance": 50000,
-    "current_balance": 52966,
-    "total_pnl_usd": 2966,
-    "total_pnl_pct": 5.93,
+    "current_balance": 49520,
+    "total_pnl_usd": -480,
+    "total_pnl_pct": -0.96,
     "currency": "USD",
     "instrument": "MNQ1! (Micro E-mini NASDAQ)",
     "multiplier_per_point": 2,
@@ -13,74 +13,48 @@
     "risk_per_trade_usd": 500
   },
   "portfolio_progression": [
-    { "date": "start",       "balance": 50000, "trade": null,                          "pnl": 0 },
-    { "date": "2026-04-07",  "balance": 50680, "trade": "MNQ LONG LPS/Spring",         "pnl": 680,   "contracts": 1, "pts": 340  },
-    { "date": "2026-04-16",  "balance": 51706, "trade": "MNQ LONG Markup OB",          "pnl": 1026,  "contracts": 1, "pts": 513  },
-    { "date": "2026-04-29",  "balance": 52326, "trade": "MNQ LONG Markup Retest",      "pnl": 620,   "contracts": 1, "pts": 310  },
-    { "date": "2026-05-07",  "balance": 53446, "trade": "MNQ LONG SOS Day",            "pnl": 1120,  "contracts": 1, "pts": 560  },
-    { "date": "2026-05-22",  "balance": 52966, "trade": "MNQ LONG NY Open Spike",      "pnl": -480,  "contracts": 6, "pts": -40  }
+    { "date": "start",      "balance": 50000, "trade": null,                     "pnl": 0   },
+    { "date": "2026-05-22", "balance": 49520, "trade": "MNQ LONG NY Open Spike", "pnl": -480, "contracts": 6, "pts": -40 }
   ],
-  "total_trades": 5,
-  "closed_trades": 5,
+  "total_trades": 1,
+  "closed_trades": 1,
   "open_trades": 0,
-  "win_rate": 80,
-  "loss_rate": 20,
-  "avg_rr_realized": 2.44,
-  "avg_rr_planned": 2.7,
-  "total_pnl_pts": 1683,
-  "best_trade": "2026-05-07_MNQ_LONG (+$1,120, +2R, 560 נק')",
+  "win_rate": 0,
+  "loss_rate": 100,
+  "avg_rr_realized": -1,
+  "avg_rr_planned": 3.5,
+  "total_pnl_pts": -40,
+  "best_trade": null,
   "worst_trade": "2026-05-22_MNQ_LONG (-$480, -1R, -40 נק')",
-  "streak_current": 0,
-  "streak_type": "neutral",
-  "max_win_streak": 4,
+  "streak_current": -1,
+  "streak_type": "loss",
+  "max_win_streak": 0,
   "max_loss_streak": 1,
   "contract_sizing_formula": "floor(risk_usd / (sl_pts × multiplier)), מינימום 1 חוזה",
-  "backtest_summary": {
-    "candidates_analyzed": 10,
-    "trades_taken": 5,
-    "trades_skipped": 6,
-    "skip_accuracy": "6/6 = 100%",
-    "win_rate_on_taken": "4/5 = 80%",
-    "avg_pts_per_win": 430,
-    "period": "2026-03-24 to 2026-05-22"
-  },
   "by_asset": {
-    "MNQ1!": { "count": 5, "wins": 4, "losses": 1, "pnl_pts": 1683, "pnl_usd": 2966 }
+    "MNQ1!": { "count": 1, "wins": 0, "losses": 1, "pnl_pts": -40, "pnl_usd": -480 }
   },
   "by_direction": {
-    "long": { "count": 5, "wins": 4 },
+    "long":  { "count": 1, "wins": 0 },
     "short": { "count": 0, "wins": 0 }
   },
   "by_setup": {
-    "OB_15M_NY_Open": { "count": 4, "wins": 4 },
-    "OB_15M_NY_Open_Wyckoff_LPS": { "count": 1, "wins": 1 },
-    "OB_15M_NY_Open_Simulation": { "count": 1, "wins": 0 }
+    "OB_15M_NY_Open": { "count": 1, "wins": 0 }
   },
   "by_kill_zone": {
-    "ny_open": { "count": 5, "wins": 4 }
+    "ny_open": { "count": 1, "wins": 0 }
   },
   "by_wyckoff_phase": {
-    "markup_phase": { "count": 3, "wins": 3 },
-    "accumulation_lps": { "count": 1, "wins": 1 },
-    "simulation_markup": { "count": 1, "wins": 0 }
-  },
-  "key_insight": "Markup Phase + OB ב-Kill Zone = Edge ברור. Counter-trend (6x skipped) = הצלנו את עצמנו מהפסדים.",
-  "skip_analysis": {
-    "counter_trend_shorts_skipped": 2,
-    "bearish_macro_longs_skipped": 2,
-    "unclear_structure_skipped": 2,
-    "total_avoided_loss_pts_estimate": 2800
+    "markup_phase": { "count": 1, "wins": 0 }
   },
   "lessons_applied": [
-    "Limit Order במקום Market Order — ✅",
     "SL לא הוזז — ✅",
     "אין עסקת נקמה — ✅",
-    "זיהוי Stop Hunt מוסדי לפני הכניסה — ✅",
-    "SKIP בסביבה Bearish/Counter-trend — ✅ x6",
-    "Wyckoff Spring זוהה נכון — ✅",
-    "LPS לפני SOS זוהה נכון (07.04) — ✅"
+    "Limit Order — ✅",
+    "זיהוי Stop Hunt מוסדי — ✅",
+    "נר NY Open ספייקי (151K נפח) — לשקול TP1 דינמי על High הנר"
   ],
   "rules_broken": [],
   "weekly_rule_current": "לא להיכנס Long כשהBias מ-4H לא ברור — לחכות ל-BOS",
-  "edge_definition": "MNQ1! LONG ב-NY Open Kill Zone + Bullish OB + Markup/LPS Phase + V=HI → Win Rate 80%"
+  "edge_definition": "בבנייה — נדרשות מינימום 20 עסקאות דמו אמיתיות"
 }
