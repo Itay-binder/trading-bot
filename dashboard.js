@@ -597,6 +597,26 @@ function openModal(idx) {
         }).join('')}
       </div>
     </div>\`:''}
+    <div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:22px">
+      <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:12px">📊 אימות TradingView — גרף מאויר</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
+        <div>
+          <div style="font-size:11px;color:var(--muted);margin-bottom:6px">גרף ביצוע (15M/Daily)</div>
+          <img src="/trades/\${t.filename}_chart.png" onerror="this.parentElement.innerHTML='<div style=\\"color:var(--muted);font-size:12px;padding:40px;text-align:center;border:1px dashed var(--border);border-radius:6px\\">תמונה לא זמינה</div>'" style="width:100%;border-radius:6px;border:1px solid var(--border);cursor:zoom-in" onclick="window.open(this.src,'_blank')" />
+        </div>
+        <div>
+          <div style="font-size:11px;color:var(--muted);margin-bottom:6px">סקירה מאקרו (Daily)</div>
+          <img src="/trades/\${t.filename}_entry.png" onerror="this.parentElement.innerHTML='<div style=\\"color:var(--muted);font-size:12px;padding:40px;text-align:center;border:1px dashed var(--border);border-radius:6px\\">תמונה לא זמינה</div>'" style="width:100%;border-radius:6px;border:1px solid var(--border);cursor:zoom-in" onclick="window.open(this.src,'_blank')" />
+        </div>
+      </div>
+      <div style="display:flex;gap:16px;flex-wrap:wrap;font-size:12px">
+        <span style="color:var(--blue)">🔵 Entry \${t.entry||'—'}</span>
+        <span style="color:var(--red)">🔴 SL \${t.sl||'—'}</span>
+        <span style="color:var(--green)">🟢 TP \${t.tp||'—'}</span>
+        \${t.rrPlan?'<span style="color:var(--muted)">R:R מתוכנן '+t.rrPlan+':1</span>':''}
+        \${t.killzone?'<span style="color:var(--muted)">Kill Zone: '+t.killzone+'</span>':''}
+      </div>
+    </div>
     \${t.analysisSec?\`<div class="section"><h4>ניתוח שהוביל להחלטה</h4><pre>\${t.analysisSec}</pre></div>\`:''}
     \${t.whatHappened?\`<div class="section"><h4>מה קרה בפועל</h4><pre>\${t.whatHappened}</pre></div>\`:''}
     \${t.lessonsSec?\`<div class="section"><h4>לקחים</h4><pre>\${t.lessonsSec}</pre></div>\`:''}
@@ -613,6 +633,15 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal()})
 
 const server = http.createServer((req, res) => {
   if (req.url === '/favicon.ico') { res.writeHead(204); res.end(); return; }
+  if (req.url.startsWith('/trades/') && req.url.endsWith('.png')) {
+    const imgPath = path.join(TRADES_DIR, path.basename(req.url));
+    if (fs.existsSync(imgPath)) {
+      res.writeHead(200, { 'Content-Type': 'image/png' });
+      fs.createReadStream(imgPath).pipe(res);
+      return;
+    }
+    res.writeHead(404); res.end(); return;
+  }
   const stats = readStats();
   const trades = readTrades();
   res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
