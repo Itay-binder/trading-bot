@@ -1,0 +1,9 @@
+{
+  "name": "trading-bot-dashboard",
+  "version": "1.0.0",
+  "engines": { "node": "18.x" },
+  "scripts": {
+    "start": "node dashboard.js",
+    "build": "node build.js"
+  }
+}

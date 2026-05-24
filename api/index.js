@@ -1,11 +1,9 @@
-const http = require('http');
 const fs = require('fs');
 const path = require('path');
 
-const BASE_DIR = __dirname;
+const BASE_DIR = path.join(__dirname, '..');
 const TRADES_DIR = path.join(BASE_DIR, 'trades');
 const STATS_FILE = path.join(BASE_DIR, 'stats', 'performance.json');
-const PORT = 3456;
 
 function readStats() {
   try {
@@ -372,7 +370,7 @@ thead th:last-child{border-radius:0 8px 8px 0}
 <div class="header">
   <div class="header-left">
     <div class="header-logo">📊 Trading<span>Bot</span></div>
-    <span class="live-pill">● LIVE LOCAL</span>
+    <span class="live-pill">● LIVE</span>
   </div>
   <div style="display:flex;align-items:center;gap:14px">
     <button class="refresh-btn" onclick="location.reload()">🔄 רענון</button>
@@ -611,22 +609,10 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal()})
 </html>`;
 }
 
-const server = http.createServer((req, res) => {
+module.exports = (req, res) => {
   if (req.url === '/favicon.ico') { res.writeHead(204); res.end(); return; }
   const stats = readStats();
   const trades = readTrades();
   res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
   res.end(buildPage(stats, trades));
-});
-
-if (require.main === module) {
-  server.listen(PORT, '127.0.0.1', () => {
-    console.log('');
-    console.log('  ┌─────────────────────────────────────────┐');
-    console.log('  │  📊 Trading Dashboard — פעיל            │');
-    console.log(`  │  http://localhost:${PORT}                  │`);
-    console.log('  │  Ctrl+C לעצירה                           │');
-    console.log('  └─────────────────────────────────────────┘');
-    console.log('');
-  });
-}
+};
