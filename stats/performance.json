@@ -1,11 +1,11 @@
 {
-  "updated_at": "2026-05-24",
-  "note": "11 עסקאות דמו — 10 Replay Simulation (ינואר-פברואר 2026) + 1 Live Demo (מאי 2026). Backtests הוסרו.",
+  "updated_at": "2026-05-25",
+  "note": "16 עסקאות דמו — 10 Replay Simulation (ינואר-פברואר 2026) + 5 Blind Replay (מרץ 2026) + 1 Live Demo (מאי 2026). Backtests הוסרו.",
   "account": {
     "starting_balance": 50000,
-    "current_balance": 64500,
-    "total_pnl_usd": 14500,
-    "total_pnl_pct": 29.0,
+    "current_balance": 68240,
+    "total_pnl_usd": 18240,
+    "total_pnl_pct": 36.5,
     "currency": "USD",
     "instrument": "MNQ1! (Micro E-mini NASDAQ)",
     "multiplier_per_point": 2,
@@ -24,50 +24,57 @@
     { "date": "2026-02-12",  "balance": 60996, "trade": "MNQ SHORT BSL Sweep 3rd Test",    "pnl": 2160,  "type": "replay", "contracts": 6,  "pts": 180,  "r": 4.0   },
     { "date": "2026-02-23",  "balance": 63576, "trade": "MNQ SHORT BSL Sweep 5th Test",    "pnl": 2580,  "type": "replay", "contracts": 3,  "pts": 430,  "r": 4.78  },
     { "date": "2026-02-25",  "balance": 64980, "trade": "MNQ LONG BB Squeeze ICT OB",      "pnl": 1404,  "type": "replay", "contracts": 3,  "pts": 234,  "r": 2.52  },
-    { "date": "2026-05-22",  "balance": 64500, "trade": "MNQ LONG NY Open Spike",          "pnl": -480,  "type": "demo",   "contracts": 6,  "pts": -40,  "r": -1.0  }
+    { "date": "2026-05-22",  "balance": 64500, "trade": "MNQ LONG NY Open Spike",          "pnl": -480,  "type": "demo",   "contracts": 6,  "pts": -40,  "r": -1.0  },
+    { "date": "2026-03-12",  "balance": 66380, "trade": "MNQ SHORT LPSY London BSL Sweep", "pnl": 1880,  "type": "replay", "contracts": 2,  "pts": 470,  "r": 4.7   },
+    { "date": "2026-03-16",  "balance": 65980, "trade": "MNQ SHORT LPSY SL Hit Spike",     "pnl": -400,  "type": "replay", "contracts": 2,  "pts": -100, "r": -1.0  },
+    { "date": "2026-03-23",  "balance": 66780, "trade": "MNQ SHORT BSL Sweep 4th Test",    "pnl": 800,   "type": "replay", "contracts": 1,  "pts": 400,  "r": 2.86  },
+    { "date": "2026-03-25",  "balance": 67560, "trade": "MNQ SHORT BB Upper LPSY",         "pnl": 780,   "type": "replay", "contracts": 1,  "pts": 390,  "r": 2.29  },
+    { "date": "2026-03-30",  "balance": 68240, "trade": "MNQ SHORT BSL Sweep EOD Close",   "pnl": 680,   "type": "replay", "contracts": 1,  "pts": 340,  "r": 2.27  }
   ],
-  "total_trades": 11,
-  "closed_trades": 11,
+  "total_trades": 16,
+  "closed_trades": 16,
   "open_trades": 0,
-  "win_rate": 72.7,
-  "loss_rate": 27.3,
-  "avg_rr_realized": 2.80,
-  "avg_rr_planned": 4.20,
-  "total_pnl_pts": 1657,
+  "win_rate": 75.0,
+  "loss_rate": 25.0,
+  "avg_rr_realized": 2.74,
+  "avg_rr_planned": 3.85,
+  "total_pnl_pts": 2727,
   "best_trade": "2026-01-14_MNQ_SHORT (+$3,200, +7.1R, +320 נק')",
   "worst_trade": "2026-02-11_MNQ_SHORT (-$540, -1R, -45 נק')",
   "streak_current": 3,
   "streak_type": "win",
-  "max_win_streak": 4,
+  "max_win_streak": 5,
   "max_loss_streak": 1,
   "contract_sizing_formula": "floor(risk_usd / (sl_pts × multiplier)), מינימום 1 חוזה",
   "by_asset": {
-    "MNQ1!": { "count": 11, "wins": 8, "losses": 3, "pnl_pts": 1657, "pnl_usd": 14500 }
+    "MNQ1!": { "count": 16, "wins": 12, "losses": 4, "pnl_pts": 2727, "pnl_usd": 18240 }
   },
   "by_direction": {
-    "long":  { "count": 3, "wins": 1, "losses": 2, "win_rate_pct": 33.3, "note": "1/3 — LONG רק בתנאי BOS Bullish מאושר + ICT OB + BB Squeeze" },
-    "short": { "count": 8, "wins": 7, "losses": 1, "win_rate_pct": 87.5, "note": "7/8 — SHORT ב-Bearish Bias = 87.5% win rate" }
+    "long":  { "count": 3,  "wins": 1, "losses": 2, "win_rate_pct": 33.3, "note": "1/3 — LONG רק בתנאי BOS Bullish מאושר + ICT OB + BB Squeeze" },
+    "short": { "count": 13, "wins": 11, "losses": 2, "win_rate_pct": 84.6, "note": "11/13 — SHORT ב-Bearish Bias = 84.6% win rate" }
   },
   "by_setup": {
-    "BSL_Sweep_SHORT":      { "count": 5, "wins": 5, "avg_r": 5.18, "note": "Jan 14+7.1R, Jan 16+6.7R, Feb 10+3.33R, Feb 12+4.0R, Feb 23+4.78R — 100% WIN RATE" },
-    "OB_SHORT_EOD":         { "count": 1, "wins": 1, "avg_r": 3.65, "note": "Jan 15 +3.65R — EOD קטע, TP1 לא הגיע" },
-    "FVG_SHORT_EOD":        { "count": 1, "wins": 1, "avg_r": 0.74, "note": "Jan 8 +0.74R — TP רחוק מדי ל-EOD" },
-    "FVG_LONG":             { "count": 1, "wins": 0, "avg_r": -1.0, "note": "Jan 13 UTAD pattern — RED FLAG לא זוהה" },
-    "OB_15M_NY_Open":       { "count": 1, "wins": 0, "avg_r": -1.0, "note": "May 22 Spike retracement" },
-    "Limit_Displacement_SL": { "count": 1, "wins": 0, "avg_r": -1.0, "note": "Feb 11 — SL בתוך ה-displacement, לא מעל הפסגה" },
-    "ICT_OB_LONG_BB_Squeeze": { "count": 1, "wins": 1, "avg_r": 2.52, "note": "Feb 25 — BB Squeeze + Bullish BOS + ICT OB = LONG מנצח" }
+    "BSL_Sweep_SHORT":          { "count": 8, "wins": 8, "avg_r": 4.58, "note": "Jan14+7.1R, Jan16+6.7R, Feb10+3.33R, Feb12+4.0R, Feb23+4.78R, Mar23+2.86R, Mar25+2.29R, Mar30+2.27R — 100% WIN RATE" },
+    "LPSY_SHORT":               { "count": 2, "wins": 1, "avg_r": 1.85, "note": "Mar12+4.7R (WIN), Mar16-1R (SL hit by spike) — SL placement critical" },
+    "OB_SHORT_EOD":             { "count": 1, "wins": 1, "avg_r": 3.65, "note": "Jan 15 +3.65R — EOD קטע, TP1 לא הגיע" },
+    "FVG_SHORT_EOD":            { "count": 1, "wins": 1, "avg_r": 0.74, "note": "Jan 8 +0.74R — TP רחוק מדי ל-EOD" },
+    "FVG_LONG":                 { "count": 1, "wins": 0, "avg_r": -1.0, "note": "Jan 13 UTAD pattern — RED FLAG לא זוהה" },
+    "OB_15M_NY_Open":           { "count": 1, "wins": 0, "avg_r": -1.0, "note": "May 22 Spike retracement" },
+    "Limit_Displacement_SL":    { "count": 2, "wins": 0, "avg_r": -1.0, "note": "Feb11 + Mar16 — אותה שגיאה פעמיים: SL בתוך ה-displacement" },
+    "ICT_OB_LONG_BB_Squeeze":   { "count": 1, "wins": 1, "avg_r": 2.52, "note": "Feb 25 — BB Squeeze + Bullish BOS + ICT OB = LONG מנצח" }
   },
   "by_kill_zone": {
-    "ny_open":      { "count": 10, "wins": 7, "win_rate_pct": 70.0 },
-    "london_open":  { "count": 1,  "wins": 1, "win_rate_pct": 100.0 }
+    "ny_open":      { "count": 14, "wins": 10, "win_rate_pct": 71.4 },
+    "london_open":  { "count": 2,  "wins": 2,  "win_rate_pct": 100.0 }
   },
   "by_wyckoff_phase": {
     "distribution_utad":    { "count": 5, "wins": 5, "win_rate_pct": 100, "note": "SHORT בDistribution = 100% win" },
     "markup_phase":         { "count": 3, "wins": 1, "win_rate_pct": 33,  "note": "LONG ב-Markup עם UTAD Red Flags = 0%; עם BOS מאושר + ICT OB + BB Squeeze = WIN" },
-    "re_distribution":      { "count": 3, "wins": 2, "win_rate_pct": 67,  "note": "SHORT בRe-Distribution = עובד אם מזוהה נכון" }
+    "re_distribution":      { "count": 3, "wins": 2, "win_rate_pct": 67,  "note": "SHORT בRe-Distribution = עובד אם מזוהה נכון" },
+    "markdown_phase":       { "count": 5, "wins": 4, "win_rate_pct": 80,  "note": "SHORT ב-Markdown LPSY = 4/5 (80%). אחד נכשל בגלל SL צר ב-Displacement" }
   },
   "key_patterns_discovered": [
-    "BSL Sweep ב-NY Open + Lower Highs = HIGHEST PRIORITY SHORT SETUP (5/5 ✅, avg 5.18R)",
+    "BSL Sweep ב-NY Open + Lower Highs = HIGHEST PRIORITY SHORT SETUP (8/8 ✅, avg 4.58R)",
     "LPSY Pattern = OB bearish נבדק 3+ ימים עוקבים + Lower High = שורט נקי (100%)",
     "UTAD Red Flag = 3+ sweeps מעל BSL ללא סגירה מעלה → Distribution, לא Markup",
     "LONG עם Bearish 4H Bias = 0% win. עצור ולחפש שורט.",
@@ -75,28 +82,47 @@
     "SSL Sweep + NY Open Reversal = LONG חזק (NOT SHORT) — מוסדיים נקו SSL לפני Markup",
     "BB Squeeze (< 50 נק' טווח) + ICT OB + Bullish BOS = HIGHEST PRIORITY LONG SETUP",
     "Old TP levels (Jan TP1/TP2) = עתידי Bearish OB / BSL Targets — לסמן ולעקוב",
-    "SL חייב להיות מעל PEAK ה-spike (לא בתוכו) — Feb 11 לעומת Feb 12"
+    "SL חייב להיות מעל PEAK ה-spike (לא בתוכו) — Feb 11, Mar 16 vs Feb 12, Mar 23",
+    "Crash 1,000+ נק' ב-3 ימים = Spring/Selling Climax. SHORT לאחריו = סיכון גבוה",
+    "LPSY Declining Levels מנבאות את הרמה הבאה: 25,100 → 24,929 → 24,500 → 24,490 → 23,400",
+    "EOD Rule הגן: Mar 30 EOD close ב-23,060 הציל מ-Reversal ל-26,400 (+3,000 נק')"
   ],
+  "recurring_mistake": {
+    "name": "SL בתוך Displacement",
+    "count": 2,
+    "instances": ["2026-02-11", "2026-03-16"],
+    "fix": "SL תמיד מעל peak ה-spike — גם אם זה אומר SL רחוק ב-150-200 נק'"
+  },
   "edge_definition": {
-    "status": "11 עסקאות — מגמה חזקה, נדרשות 20 לאישור מלא",
-    "preliminary_edge": "SHORT בBearish 4H Bias + BSL Sweep + NY Open Kill Zone (5/5 = 100%)",
-    "secondary_edge": "LONG בBullish BOS מאושר + ICT OB + BB Squeeze (1/1 = 100%, נדרש עוד נתונים)",
-    "win_rate_short": "87.5% (7/8)",
+    "status": "16 עסקאות — Edge ראשוני מאושר, נדרשות 20+ לאישור מלא",
+    "primary_edge": "SHORT בBearish 4H Bias + BSL Sweep + NY Open Kill Zone (8/8 = 100%)",
+    "secondary_edge": "SHORT ב-LPSY Declining Pattern + Markdown Phase (4/5 = 80% אם SL נכון)",
+    "tertiary_edge": "LONG בBullish BOS מאושר + ICT OB + BB Squeeze (1/1 = 100%, נדרש עוד נתונים)",
+    "win_rate_short": "84.6% (11/13)",
     "win_rate_long": "33.3% (1/3)",
-    "recommendation": "מוקד ראשי: BSL Sweep SHORT. מוקד משני: BOS Bullish + BB Squeeze LONG. אין LONG ב-Bearish Bias."
+    "recommendation": "מוקד ראשי: BSL Sweep SHORT. מוקד משני: LPSY Markdown SHORT עם SL רחב. אין LONG ב-Bearish Bias."
   },
   "lessons_applied": [
-    "SL לא הוזז בשום עסקה — ✅ 11/11",
-    "אין עסקת נקמה — ✅ 11/11",
-    "Limit/Market Order מתוכנן — ✅ 11/11",
-    "EOD close בוצע כשTP לא הגיע — ✅ Jan 8, Jan 15",
+    "SL לא הוזז בשום עסקה — ✅ 16/16",
+    "אין עסקת נקמה — ✅ 16/16",
+    "Limit/Market Order מתוכנן — ✅ 16/16",
+    "EOD close בוצע כשTP לא הגיע — ✅ Jan 8, Jan 15, Mar 30",
     "זיהוי UTAD pattern (Jan 14 SHORT ← הפיכת הפסד Jan 13 לרווח Jan 14)",
-    "SL מעל peak ה-spike (תיקון Feb 11 → Feb 12 WIN)",
+    "SL מעל peak ה-spike (תיקון Feb 11 → Feb 12 WIN, אך חזרה לשגיאה Mar 16)",
     "SSL Sweep + Reversal = Bias shift לBullish (Feb 24 → Feb 25 LONG)",
-    "7 ימי NO TRADE (Feb 13-22) — משמעת: לא לכפות עסקה בלי סטאפ"
+    "7 ימי NO TRADE (Feb 13-22) — משמעת: לא לכפות עסקה בלי סטאפ",
+    "London Open spike מעל SL → לא נכנסים, מחכים ל-NY Open (Mar 30 ✅)",
+    "LPSY Declining Levels — לחשב מראש את הרמה הבאה ולהכין תוכנית"
   ],
-  "rules_broken": [],
-  "weekly_rule_current": "SHORT: BSL Sweep + NY Open + 4H Bearish Bias. LONG: BOS Bullish מאושר + ICT OB + BB Squeeze בלבד.",
+  "rules_broken": [
+    {
+      "date": "2026-03-16",
+      "rule": "SL מעל spike peak",
+      "description": "SL ב-25,030 = בתוך ה-displacement. זהה לFeb 11. שגיאה חוזרת.",
+      "consequence": "-$400 (-1R)"
+    }
+  ],
+  "weekly_rule_current": "SHORT: BSL Sweep + NY Open + 4H Bearish Bias. SL חייב להיות מעל peak ה-spike (לא רק +100 נק'). LONG: BOS Bullish מאושר + ICT OB + BB Squeeze בלבד.",
   "replay_session_summary_jan": {
     "dates": "2026-01-08 עד 2026-01-16",
     "instrument": "MNQ1!",
@@ -116,7 +142,19 @@
     "total_pnl_usd": 7284,
     "total_r": 13.63,
     "no_trade_days": 7,
-    "note": "TRUE BLIND Replay — screenshots בלבד, אין data_get_ohlcv. משמעת: 7 ימים ללא סטאפ → לא נכנסו. ✅",
+    "note": "TRUE BLIND Replay — screenshots בלבד. משמעת: 7 ימים ללא סטאפ → לא נכנסו. ✅",
     "key_discovery": "SSL Sweep + NY Open = LONG (NOT SHORT). BB Squeeze 43נק' + ICT OB + Bullish BOS = פריצה אלימה."
+  },
+  "replay_session_summary_mar": {
+    "dates": "2026-03-12 עד 2026-03-30",
+    "instrument": "MNQ1!",
+    "trades": 5,
+    "wins": 4,
+    "losses": 1,
+    "total_pnl_usd": 3740,
+    "total_r": 11.12,
+    "no_trade_days": 3,
+    "note": "TRUE BLIND Replay. Markdown Phase — LPSY declining levels. שגיאת SL חזרה (Mar 16 = Feb 11). EOD Rule הציל (Mar 30).",
+    "key_discovery": "LPSY Declining Pattern (25,100→24,929→24,500→24,490→23,400) = HIGHEST PRIORITY SHORT ב-Markdown. SL חייב מעל spike peak תמיד."
   }
 }
